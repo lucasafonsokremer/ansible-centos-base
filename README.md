@@ -33,7 +33,7 @@ Role Variables
 --------------
 
 * Disable root account
-        ansible_centos_base__disable_root_user: 'yes' or 'no', when this parameter was set to 'no', the root user account will remain active.
+        ansible_centos_base__disable_root_user: 'yes' or 'no', when this parameter was set to 'no', the root user account will remain active. By default, this var value is 'no'.
 
 * Set umask to 077
         ansible_centos_base__improve_umaskto_077 if defined, will set "umask" on /etc/profile to "umask 077". Insert 'yes' on this var if you wanted.
