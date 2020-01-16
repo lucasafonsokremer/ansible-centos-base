@@ -1,0 +1,15 @@
+- name: BASE_OS | BASHPROFILE | root user
+  copy:
+    src: bash_profile
+    dest: "/root/.bash_profile"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: BASE_OS | BASHPROFILE | "{{ ansible_centos_base__username }}" user
+  copy:
+    src: bash_profile
+    dest: "/home/{{ ansible_centos_base__username }}/.bash_profile"
+    owner: "{{ ansible_centos_base__username }}"
+    group: "{{ ansible_centos_base__username }}"
+    mode: 0644

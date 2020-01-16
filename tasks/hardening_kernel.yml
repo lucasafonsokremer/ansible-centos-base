@@ -1,0 +1,6 @@
+---
+- name: HARDENING | KERNEL | Disable various kernel modules
+  copy:
+    content: "install {{ item }} /bin/false"
+    dest: /etc/modprobe.d/{{ item }}.conf
+  loop: "{{ ansible_centos_base__modules_to_disable }}"

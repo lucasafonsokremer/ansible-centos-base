@@ -1,0 +1,9 @@
+---
+- name: HARDENING | UMASK | Set default umask to {{ item.line }} in {{ item.dest }}
+  lineinfile:
+    dest: "{{ item.dest }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop: "{{ umask_files }}"
+  when: ansible_centos_base__improve_umaskto_077 is defined and ansible_centos_base__improve_umaskto_077 == "yes"

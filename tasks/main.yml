@@ -1,0 +1,18 @@
+---
+- include: user.yml
+- include: bash_profile.yml
+- include: packages.yml
+- include: timezone.yml
+- include: logintimeout.yml
+- include: hardening_auditd.yml
+- include: hardening_kernel.yml
+- include: hardening_misc.yml
+- include: hardening_password.yml
+- include: hardening_services.yml
+- include: hardening_sshd.yml
+- include: hardening_sysctl.yml
+- include: hardening_users.yml
+- include: hardening_aide.yml
+- include: hardening_umask.yml
+- include: firewall.yml
+  when: ansible_distribution_major_version >= '7'

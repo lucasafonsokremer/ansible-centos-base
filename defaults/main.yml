@@ -1,0 +1,134 @@
+---
+#
+# User setup
+#
+ansible_centos_base__username: ansible
+#
+# Packages setup
+#
+ansible_centos_base__text_editor: vim
+ansible_centos_base__packages_centos8:
+  - git
+  - sudo
+  - vim-enhanced
+  - which
+  - mlocate
+  - setroubleshoot-*
+  - python3-firewall
+  - python3-pip
+  - python3-virtualenv
+  - gnupg
+  - aide
+  - openssl
+  - rsyslog
+  - logrotate
+  - tzdata
+  - chrony
+  - audispd-plugins
+ansible_centos_base__packages_centos7:
+  - git
+  - sudo
+  - vim-enhanced
+  - which
+  - yum-plugin-keys
+  - mlocate
+  - setroubleshoot-*
+  - python-firewall
+  - python-pip
+  - python-virtualenv
+  - gnupg
+  - aide
+  - openssl
+  - rsyslog
+  - logrotate
+  - tzdata
+  - chrony
+ansible_centos_base__packages_extra:
+  - kernel-doc
+  - bind-utils
+  - tcpdump
+  - bash-completion
+  - yum-utils
+  - lsof
+  - tuned-utils
+  - strace
+  - ltrace
+#
+# Timezone setup
+#
+ansible_centos_base__timezone_saopaulo: 'America/Sao_Paulo'
+#
+# Audit configs
+#
+path_bin_aide: /usr/sbin/aide
+path_pam_system_auth: /etc/pam.d/system-auth
+path_pam_password_auth: /etc/pam.d/system-auth
+path_mac_config: /etc/selinux/
+path_auditd_rules: /etc/audit/rules.d/audit.rules
+path_aide_db: /var/lib/aide/aide.db.gz
+#
+# Grub - Boot
+#
+path_grub_cfg: /boot/grub2/grub.cfg
+grub_mkconfig: grub2-mkconfig
+umask_files:
+  - { dest: "/etc/profile", regexp: "^umask", line: "umask 077" }
+deny_failed_login_auth_files:
+  - "{{ path_pam_system_auth }}"
+  - '/etc/pam.d/password-auth'
+deny_failed_login_account_files: "{{ deny_failed_login_auth_files }}"
+#
+# SSH
+#
+ansible_centos_base__root_login: yes
+#
+# USER
+#
+ansible_centos_base__disable_root_user: no
+#
+# KERNEL MODULES
+#
+ansible_centos_base__modules_to_disable:
+  - cramfs
+  - freevxfs
+  - jffs2
+  - hfs
+  - hfsplus
+  - squashfs
+  - udf
+  - dccp
+  - sctp
+  - rds
+  - tipc
+  - firewire-core
+  - usb-storage
+  - net-pf-31
+  - bluetooth
+#
+# SYSCTL PARAMETERS
+#
+ansible_centos_base__sysctl_parameters:
+  - { name: 'net.ipv4.conf.all.send_redirects', value: 0 }
+  - { name: 'net.ipv4.conf.default.send_redirects', value: 0 }
+  - { name: 'net.ipv4.conf.all.accept_redirects', value: 0 }
+  - { name: 'net.ipv4.conf.default.accept_redirects', value: 0 }
+  - { name: 'net.ipv6.conf.all.accept_redirects', value: 0 }
+  - { name: 'net.ipv6.conf.default.accept_redirects', value: 0 }
+  - { name: 'net.ipv4.conf.all.secure_redirects', value: 0 }
+  - { name: 'net.ipv4.conf.default.secure_redirects', value: 0 }
+  - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: 1 }
+  - { name: 'net.ipv4.icmp_ignore_bogus_error_responses', value: 1 }
+  - { name: 'net.ipv4.tcp_syncookies', value: 1 }
+  - { name: 'net.ipv4.conf.all.rp_filter', value: 1 }
+  - { name: 'net.ipv4.conf.default.rp_filter', value: 1 }
+  - { name: 'kernel.core_uses_pid', value: 1 }
+  - { name: 'kernel.sysrq', value: 0 }
+  - { name: 'kernel.randomize_va_space', value: 2 }
+  - { name: 'net.ipv4.conf.all.log_martians', value: 1 }
+  - { name: 'net.ipv4.conf.default.log_martians', value: 1 }
+  - { name: 'net.ipv4.conf.all.accept_source_route', value: 0 }
+  - { name: 'net.ipv4.conf.default.accept_source_route', value: 0 }
+  - { name: 'net.ipv4.tcp_timestamps', value: 0 }
+  - { name: 'net.ipv6.conf.default.accept_ra', value: 0 }
+  - { name: 'fs.suid_dumpable', value: 0 }
+

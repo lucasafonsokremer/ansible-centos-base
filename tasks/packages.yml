@@ -1,0 +1,52 @@
+---
+- name: BASE_OS | PACKAGES | Ensure EPEL installed
+  yum: 
+    name: epel-release
+    state: latest
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: BASE_OS | PACKAGES | Ensure deltarpm installed
+  yum: 
+    name: drpm
+    state: latest
+  when: ansible_distribution_major_version >= '8'
+
+- name: BASE_OS | PACKAGES | Ensure deltarpm installed
+  yum: 
+    name: deltarpm
+    state: latest
+  when: ansible_distribution_major_version <= '7'
+
+- name: BASE_OS | PACKAGES | Ensure basic packages installed
+  yum: 
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ ansible_centos_base__packages_centos8 }}"
+  when: ansible_distribution_major_version >= '8'
+
+- name: BASE_OS | PACKAGES | Ensure basic packages installed
+  yum: 
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ ansible_centos_base__packages_centos7 }}"
+  when: ansible_distribution_major_version <= '7'
+
+- name: BASE_OS | PACKAGES | Install Extra packages
+  yum: 
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ ansible_centos_base__packages_extra }}"
+  when: ansible_centos_base__packages_extra is defined
+  notify: 
+    - restart crond
+
+- name: BASE_OS | PACKAGES | upgrade any out of date packages
+  yum:
+    name: '*'
+    state: latest
+    update_cache: yes
+
+- name: BASE_OS | PACKAGES | Install pexpect via pip
+  pip:
+    name: "pexpect"
+    version: "3.3"

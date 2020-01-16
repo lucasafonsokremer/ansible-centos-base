@@ -1,0 +1,6 @@
+---
+- name: HARDENING | SYSCTL | sysctl configuration
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop: "{{ ansible_centos_base__sysctl_parameters }}"

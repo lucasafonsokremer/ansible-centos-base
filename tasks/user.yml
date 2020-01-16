@@ -1,0 +1,29 @@
+---
+- name: BASE_OS | Check the var "{{ ansible_centos_base__username }}" before run
+  fail:
+    msg: "You need to set up a user on ansible_centos_base__username"
+  when: ansible_centos_base__username is not defined
+
+- name: BASE_OS | Check if "{{ ansible_centos_base__username }}" user exists
+  user:
+    name: "{{ ansible_centos_base__username }}"
+    state: present
+
+- name: BASE_OS | "{{ ansible_centos_base__username }}" USER | Set up authorized_keys
+  authorized_key:
+    user: "{{ ansible_centos_base__username }}"
+    key: "{{ item }}"
+    state: present
+    exclusive: True
+  with_file:
+    - authorized_keys
+
+- name: BASE_OS | "root" USER | Set up authorized_keys
+  authorized_key:
+    user: "root"
+    key: "{{ item }}"
+    state: present
+    exclusive: True
+  with_file:
+    - authorized_keys
+  when: ansible_centos_base__disable_root_user is not defined or ansible_centos_base__disable_root_user == "no"
