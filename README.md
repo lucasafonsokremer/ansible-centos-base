@@ -1,6 +1,9 @@
 Ansible role to configure some Red Hat based system packages and rules.
 This role was based on the awesome job by https://github.com/kleinstuff
 
+Created by Lucas Afonso Kremer
+https://www.linkedin.com/in/lucasafonsokremer
+
 Requirements
 ------------
 
