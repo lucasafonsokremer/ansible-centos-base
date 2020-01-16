@@ -98,6 +98,7 @@ Role Informations
 
 ```
         ansible_centos_base__packages_extra:
+          - kernel-doc
           - bind-utils
           - tcpdump
           - tuned-utils
