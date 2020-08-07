@@ -1,5 +1,5 @@
 ---
-- name: HARDENING | UMASK | Set default umask to {{ item.line }} in {{ item.dest }}
+- name: ANSIBLE_CENTOS_BASE | UMASK | Set default umask to {{ item.line }} in {{ item.dest }}
   lineinfile:
     dest: "{{ item.dest }}"
     regexp: "{{ item.regexp }}"

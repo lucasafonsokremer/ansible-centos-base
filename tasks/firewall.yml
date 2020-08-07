@@ -1,5 +1,5 @@
 ---
-- name: BASE_OS | FIREWALL | Ensure iptables is not running
+- name: ANSIBLE_CENTOS_BASE | FIREWALL | Ensure iptables is not running
   service:
     name: "{{ item }}"
     state: stopped
@@ -9,18 +9,18 @@
     - ip6tables
   ignore_errors: yes
 
-- name: BASE_OS | FIREWALL | Install firewalld
+- name: ANSIBLE_CENTOS_BASE | FIREWALL | Install firewalld
   yum:
     name: firewalld
     state: present
 
-- name: BASE_OS | FIREWALL | Ensure firewalld is started and enabled on boot
+- name: ANSIBLE_CENTOS_BASE | FIREWALL | Ensure firewalld is started and enabled on boot
   service:
     name: firewalld
     state: started
     enabled: yes
 
-- name: BASE_OS | FIREWALL | Block timestamp-request and timestamp-reply
+- name: ANSIBLE_CENTOS_BASE | FIREWALL | Block timestamp-request and timestamp-reply
   firewalld:
     icmp_block: "{{ item }}"
     permanent: yes

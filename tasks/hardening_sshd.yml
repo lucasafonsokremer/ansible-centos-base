@@ -1,5 +1,5 @@
 ---
-- name: HARDENING | SSHD | Create the file /etc/ssh/banner 
+- name: ANSIBLE_CENTOS_BASE | SSHD | Create the file /etc/ssh/banner
   copy:
     content: |
       *  Toda sua atividade pode ser rastreada atraves de logs.
@@ -7,7 +7,7 @@
     dest: /etc/ssh/banner
 
 # V-38613 - The ssh daemon must not permit root logins
-- name: HARDENING | SSHD | root login | Set the config PermitRootLogin to "yes"
+- name: ANSIBLE_CENTOS_BASE | SSHD | root login | Set the config PermitRootLogin to "yes"
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "^(#)?PermitRootLogin"
@@ -17,7 +17,7 @@
   when: ansible_centos_base__root_login is defined and ansible_centos_base__root_login == "yes"
 
 # V-38613 - The ssh daemon must not permit root logins
-- name: HARDENING | SSHD | root login | Set the config PermitRootLogin to "no"
+- name: ANSIBLE_CENTOS_BASE | SSHD | root login | Set the config PermitRootLogin to "no"
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "^(#)?PermitRootLogin"
@@ -26,46 +26,12 @@
     validate: '/usr/sbin/sshd -T -f %s'
   when: ansible_centos_base__root_login is defined and ansible_centos_base__root_login == "no"
 
-- name: HARDENING | SSHD | Setup sshd configuration
+- name: ANSIBLE_CENTOS_BASE | SSHD | Setup sshd configuration
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "{{ item.reg }}"
     line: "{{ item.line }}"
     state: present
     validate: '/usr/sbin/sshd -T -f %s'
-  loop:
-    - { reg: '^(#)?PasswordAuthentication', line: 'PasswordAuthentication no'}
-    # V-38613 - The ssh daemon must not permit root logins
-    - { reg: '^(#)?AllowTcpForwarding', line: 'AllowTcpForwarding no'}
-    - { reg: '^(#)?Compression', line: 'Compression no'}
-    - { reg: '^(#)?LogLevel', line: 'LogLevel VERBOSE'}
-    - { reg: '^(#)?MaxAuthTries', line: 'MaxAuthTries 4'}
-    - { reg: '^(#)?MaxSessions', line: 'MaxSessions 5'}
-    - { reg: '^(#)?TCPKeepAlive', line: 'TCPKeepAlive no'}
-    - { reg: '^(#)?UsePrivilegeSeparation', line: 'UsePrivilegeSeparation SANDBOX'}
-    - { reg: '^(#)?X11Forwarding', line: 'X11Forwarding no'}
-    # V-38607 - The SSH daemon must be configured to use only the SSHv2 protocol
-    - { reg: '^(#)?PrintLastLog', line: 'PrintLastLog yes'}
-    # V-38607 - The SSH daemon must be configured to use only the SSHv2 protocol
-    - { reg: '^(#)?Protocol \d', line: 'Protocol 2'}
-    # V-38614 - The SSH daemon must not allow authentication using an empty password
-    - { reg: '^(#)?PermitEmptyPasswords', line: 'PermitEmptyPasswords no'}
-    # V-38612 - The SSH daemon must not allow host-based authentication
-    - { reg: '^(#)?HostbasedAuthentication', line: 'HostbasedAuthentication no'}
-    # V-38608 - Set a timeout interval for idle ssh sessions
-    - { reg: '^(#)?ClientAliveInterval', line: 'ClientAliveInterval 300'}
-    # V-38610 - Set a timeout count on idle ssh sessions
-    # OpenSCAP report - CCP profile suggested value of 0
-    - { reg: '^(#)?ClientAliveCountMax', line: 'ClientAliveCountMax 0'}
-    # V-38611 - The sshd daemon must ignore .rhosts files
-    - { reg: '^(#)?IgnoreRhosts', line: 'IgnoreRhosts yes'}
-    # V-38616 - The ssh daemon must not permit user environment settings
-    - { reg: '^(#)?PermitUserEnvironment', line: 'PermitUserEnvironment no'}
-    # V-38617 - The ssh daemon must be configured to use approved ciphers
-    - { reg: '^(#)?Ciphers', line: 'Ciphers aes256-ctr,aes256-cbc'}
-    # OpenSCAP report - CCP profile suggested referencing warning banner
-    - { reg: '^(#)?Banner', line: 'Banner /etc/ssh/banner'}
-    # Suggested by lynis audit
-    - { reg: '^(#)?UseDNS', line: 'UseDNS no'}
-    - { reg: '^(#)?AllowAgentForwarding', line: 'AllowAgentForwarding no'}
+  loop: "{{ ansible_centos_base__sshd_configuration }}"
   notify: restart_ssh

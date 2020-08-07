@@ -1,6 +1,5 @@
 ---
-# Do not allow normal users to use cron
-- name: HARDENING | SERVICES | Do not allow normal users to use cron
+- name: ANSIBLE_CENTOS_BASE | SERVICES | Do not allow normal users to use cron
   copy:
     content: "root"
     dest: "/etc/cron.allow"
@@ -8,8 +7,7 @@
     group: root
     mode: 0644
 
-# Remove Mail Services
-- name: HARDENING | SERVICES | Disable mail services
+- name: ANSIBLE_CENTOS_BASE | SERVICES | Disable mail services
   service:
     name: "{{ item }}"
     enabled: false

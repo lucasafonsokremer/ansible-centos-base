@@ -1,52 +1,52 @@
 ---
-- name: BASE_OS | PACKAGES | Ensure EPEL installed
-  yum: 
+- name: ANSIBLE_CENTOS_BASE | PACKAGES | Ensure EPEL installed
+  yum:
     name: epel-release
-    state: latest
+    state: present
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-- name: BASE_OS | PACKAGES | Ensure deltarpm installed
-  yum: 
+- name: ANSIBLE_CENTOS_BASE | PACKAGES | Ensure deltarpm installed
+  yum:
     name: drpm
-    state: latest
+    state: present
   when: ansible_distribution_major_version >= '8'
 
-- name: BASE_OS | PACKAGES | Ensure deltarpm installed
-  yum: 
+- name: ANSIBLE_CENTOS_BASE | PACKAGES | Ensure deltarpm installed
+  yum:
     name: deltarpm
-    state: latest
+    state: present
   when: ansible_distribution_major_version <= '7'
 
-- name: BASE_OS | PACKAGES | Ensure basic packages installed
-  yum: 
+- name: ANSIBLE_CENTOS_BASE | PACKAGES | Ensure basic packages installed
+  yum:
     name: "{{ item }}"
-    state: latest
+    state: present
   loop: "{{ ansible_centos_base__packages_centos8 }}"
   when: ansible_distribution_major_version >= '8'
 
-- name: BASE_OS | PACKAGES | Ensure basic packages installed
-  yum: 
+- name: ANSIBLE_CENTOS_BASE | PACKAGES | Ensure basic packages installed
+  yum:
     name: "{{ item }}"
-    state: latest
+    state: present
   loop: "{{ ansible_centos_base__packages_centos7 }}"
   when: ansible_distribution_major_version <= '7'
 
-- name: BASE_OS | PACKAGES | Install Extra packages
-  yum: 
+- name: ANSIBLE_CENTOS_BASE | PACKAGES | Install Extra packages
+  yum:
     name: "{{ item }}"
-    state: latest
+    state: present
   loop: "{{ ansible_centos_base__packages_extra }}"
   when: ansible_centos_base__packages_extra is defined
-  notify: 
+  notify:
     - restart crond
 
-- name: BASE_OS | PACKAGES | upgrade any out of date packages
+- name: ANSIBLE_CENTOS_BASE | PACKAGES | Upgrade any out of date packages
   yum:
     name: '*'
-    state: latest
+    state: latest # noqa 403
     update_cache: yes
 
-- name: BASE_OS | PACKAGES | Install pexpect via pip
+- name: ANSIBLE_CENTOS_BASE | PACKAGES | Install pexpect via pip
   pip:
     name: "pexpect"
     version: "3.3"

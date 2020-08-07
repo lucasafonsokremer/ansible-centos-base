@@ -53,10 +53,15 @@ ansible_centos_base__packages_extra:
   - tuned-utils
   - strace
   - ltrace
+  - net-tools
 #
 # Timezone setup
 #
 ansible_centos_base__timezone_saopaulo: 'America/Sao_Paulo'
+#
+# Login Timeout
+#
+ansible_centos_base__logintimeout_profile: "yes"
 #
 # Audit configs
 #
@@ -66,6 +71,138 @@ path_pam_password_auth: /etc/pam.d/system-auth
 path_mac_config: /etc/selinux/
 path_auditd_rules: /etc/audit/rules.d/audit.rules
 path_aide_db: /var/lib/aide/aide.db.gz
+#
+# Audit configure parameters
+#
+ansible_centos_base__hardening_auditd_configure_parameters:
+  - { regexp: '^(#)?disk_error_action[\s]*=', line: 'disk_error_action = halt'}
+  - { regexp: '^(#)?disk_full_action[\s]*=', line: 'disk_full_action = halt'}
+  # Halt the computer if only 75MB is left on disk
+  - { regexp: '^(#)?space_left[\s]*=', line: 'space_left = 75'}
+  - { regexp: '^(#)?space_left_action[\s]*=', line: 'space_left_action = halt'}
+  - { regexp: '^(#)?admin_space_left_action[\s]*=', line: 'admin_space_left_action = halt'}
+#
+# Audit rules parameters
+#
+ansible_centos_base__hardening_auditd_rules_parameters:
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+-F[\s]+arch=b32.*-S[\s]+adjtimex[\s]+.*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S adjtimex -k audit_time_rules'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+-F[\s]+arch=b64.*-S[\s]+adjtimex[\s]+.*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S adjtimex -k audit_time_rules'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+-F[\s]+arch=b32.*-S[\s]+settimeofday[\s]+.*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S settimeofday -k audit_time_rules'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+-F[\s]+arch=b64.*-S[\s]+settimeofday[\s]+.*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S settimeofday -k audit_time_rules'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+-F[\s]+arch=b32.*-S[\s]+stime[\s]+.*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S stime -k audit_time_rules'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+-F[\s]+arch=b32.*-S[\s]+clock_settime[\s]+.*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S clock_settime -k audit_time_rules'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+-F[\s]+arch=b64.*-S[\s]+clock_settime[\s]+.*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S clock_settime -k audit_time_rules'}
+  - { regexp: '^[\s]*-w[\s]+\/etc\/localtime[\s]+-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b.*-k[\s]+[\S]+[\s]*$',
+      line: '-w /etc/localtime -p wa -k audit_time_rules'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+chmod[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S chmod -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+chmod[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S chmod  -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+chown[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S chown -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+chown[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S chown -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+fchmod[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S fchmod -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+fchmod[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S fchmod -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+fchmodat[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+fchmodat[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+fchown[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S fchown -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+fchown[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S fchown -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+fchownat[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S fchownat -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+fchownat[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S fchownat -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+fremovexattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+fremovexattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+fsetxattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S fsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+fsetxattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S fsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+lchown[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+lchown[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+lremovexattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S lremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+lremovexattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S lremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+lsetxattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S lsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+lsetxattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S lsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+removexattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S removexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+removexattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S removexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b32[\s]+)(?:.*-S[\s]+setxattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b32 -S setxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^[\s]*-a[\s]+always,exit[\s]+(?:.*-F[\s]+arch=b64[\s]+)(?:.*-S[\s]+setxattr[\s]+)(?:.*-F\s+auid>=1000[\s]+)(?:.*-F\s+auid!=4294967295[\s]+).*-k[\s]+[\S]+[\s]*$',
+      line: '-a always,exit -F arch=b64 -S setxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod'}
+  - { regexp: '^\-w[\s]+/etc/group[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s+]\-k[\s]+\w+[\s]*$',
+      line: '-w /etc/group -p wa -k audit_rules_usergroup_modification'}
+  - { regexp: '^\-w[\s]+/etc/passwd[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+\w+[\s]*$',
+      line: '-w /etc/passwd -p wa -k audit_rules_usergroup_modification'}
+  - { regexp: '^\-w[\s]+/etc/gshadow[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+\w+[\s]*$',
+      line: '-w /etc/gshadow -p wa -k audit_rules_usergroup_modification'}
+  - { regexp: '^\-w[\s]+/etc/shadow[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+\w+[\s]*$',
+      line: '-w /etc/shadow -p wa -k audit_rules_usergroup_modification'}
+  - { regexp: '^\-w[\s]+/etc/security/opasswd[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+\w+[\s]*$',
+      line: '-w /etc/security/opasswd -p wa -k audit_rules_usergroup_modification'}
+  - { regexp: '^\-a\s+always,exit\s+(\-F\s+arch=(b64|b32)\s+)?\-S\s+sethostname\s+\-S\s+setdomainname\s+\-k\s+[-\w]+\s*$',
+      line: '-a always,exit -F arch=b64 -S sethostname -S setdomainname -k audit_rules_networkconfig_modification'}
+  - { regexp: '^\-w[\s]+/etc/issue[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w /etc/issue -p wa -k audit_rules_networkconfig_modification'}
+  - { regexp: '^\-w[\s]+/etc/issue\.net[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w /etc/issue.net -p wa -k audit_rules_networkconfig_modification'}
+  - { regexp: '^\-w[\s]+/etc/hosts[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w /etc/hosts -p wa -k audit_rules_networkconfig_modification'}
+  - { regexp: '^\-w[\s]+/etc/sysconfig/network[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w /etc/sysconfig/network -p wa -k audit_rules_networkconfig_modification'}
+  - { regexp: '^\-w[\s]+{{ path_mac_config }}[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w {{ path_mac_config }} -p wa -k MAC-policy'}
+  - { regexp: '^\-w\s+/var/run/utmp\s+\-p\s+wa\s+\-k\s+[-\w]+\s*$',
+      line: '-w /var/run/utmp -p wa -k session'}
+  - { regexp: '^\-w\s+/var/log/btmp\s+\-p\s+wa\s+\-k\s+[-\w]+\s*$',
+      line: '-w /var/log/btmp -p wa -k session'}
+  - { regexp: '^\-w\s+/var/log/wtmp\s+\-p\s+wa\s+\-k\s+[-\w]+\s*$',
+      line: '-w /var/log/wtmp -p wa -k session'}
+  - { regexp: '^\-a\s+always,exit\s+\-F\s+arch=b32\s+?\-S\s+creat\s+\-S\s+open\s+\-S\s+openat\s+\-S\s+open_by_handle_at\s+\-S\s+truncate\s+\-S\s+ftruncate\s+\-F\s+exit=\-EACCES\s+\-F\s+auid>=1000\s+\-F\s+auid!=4294967295\s+\-k\s+[-\w]+\s*$',
+      line: '-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access'}
+  - { regexp: '^\-a\s+always,exit\s+\-F\s+arch=b32\s+?\-S\s+creat\s+\-S\s+open\s+\-S\s+openat\s+\-S\s+open_by_handle_at\s+\-S\s+truncate\s+\-S\s+ftruncate\s+\-F\s+exit=\-EPERM\s+\-F\s+auid>=1000\s+\-F\s+auid!=4294967295\s+\-k\s+[-\w]+\s*$',
+      line: '-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access'}
+  - { regexp: '^\-a\s+always,exit\s+\-F\s+arch=b64\s+?\-S\s+creat\s+\-S\s+open\s+\-S\s+openat\s+\-S\s+open_by_handle_at\s+\-S\s+truncate\s+\-S\s+ftruncate\s+\-F\s+exit=\-EACCES\s+\-F\s+auid>=1000\s+\-F\s+auid!=4294967295\s+\-k\s+[-\w]+\s*$',
+      line: '-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access'}
+  - { regexp: '^\-a\s+always,exit\s+\-F\s+arch=b64\s+?\-S\s+creat\s+\-S\s+open\s+\-S\s+openat\s+\-S\s+open_by_handle_at\s+\-S\s+truncate\s+\-S\s+ftruncate\s+\-F\s+exit=\-EPERM\s+\-F\s+auid>=1000\s+\-F\s+auid!=4294967295\s+\-k\s+[-\w]+\s*$',
+      line: '-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access'}
+  - { regexp: '^\-a\s+always,exit\s+(\-F\s+arch=(b64|b32)\s+)?\-S\s+mount\s+\-F\s+auid>=1000\s+\-F\s+auid!=4294967295\s+\-k\s+[-\w]+\s*$',
+      line: '-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=4294967295 -k export'}
+  - { regexp: '^\-a\s+always,exit\s+(\-F\s+arch=(b64|b32)\s+)?\-S\s+rmdir\s+\-S\s+unlink\s+\-S\s+unlinkat\s+\-S\s+rename\s+\-S\s+renameat\s+\-F\s+auid>=1000\s+\-F\s+auid!=4294967295\s+\-k\s+[-\w]+\s*$',
+      line: '-a always,exit -F arch=b64 -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete'}
+  - { regexp: '^\-w[\s]+/etc/sudoers[\s]+\-p[\s]+\b([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w /etc/sudoers -p wa -k actions'}
+  - { regexp: '^\-w[\s]+/usr/sbin/insmod[\s]+\-p[\s]+\b([raw]*x[raw]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w /usr/sbin/insmod -p x -k modules'}
+  - { regexp: '^\-w[\s]+/usr/sbin/rmmod[\s]+\-p[\s]+\b([raw]*x[raw]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w /usr/sbin/rmmod -p x -k modules'}
+  - { regexp: '^\-w\s+/usr/sbin/modprobe[\s]+\-p[\s]+\b([raw]*x[raw]*)\b[\s]+\-k[\s]+[-\w]+[\s]*$',
+      line: '-w /usr/sbin/modprobe -p x -k modules'}
+  - { regexp: '^\-a\s+always,exit\s+(\-F\s+arch=(b64|b32)\s+)?\-S\s+init_module\s+\-S\s+delete_module\s+\-k\s+[-\w]+\s*$',
+      line: '-a always,exit -F arch=b64 -S init_module -S delete_module -k modules'}
 #
 # Grub - Boot
 #
@@ -80,7 +217,45 @@ deny_failed_login_account_files: "{{ deny_failed_login_auth_files }}"
 #
 # SSH
 #
-ansible_centos_base__root_login: yes
+ansible_centos_base__root_login: "yes"
+#
+# SSHD Configs
+#
+ansible_centos_base__sshd_configuration:
+  - { reg: '^(#)?PasswordAuthentication', line: 'PasswordAuthentication no'}
+  # V-38613 - The ssh daemon must not permit root logins
+  - { reg: '^(#)?AllowTcpForwarding', line: 'AllowTcpForwarding no'}
+  - { reg: '^(#)?Compression', line: 'Compression no'}
+  - { reg: '^(#)?LogLevel', line: 'LogLevel VERBOSE'}
+  - { reg: '^(#)?MaxAuthTries', line: 'MaxAuthTries 4'}
+  - { reg: '^(#)?MaxSessions', line: 'MaxSessions 5'}
+  - { reg: '^(#)?TCPKeepAlive', line: 'TCPKeepAlive no'}
+  - { reg: '^(#)?UsePrivilegeSeparation', line: 'UsePrivilegeSeparation SANDBOX'}
+  - { reg: '^(#)?X11Forwarding', line: 'X11Forwarding no'}
+  # V-38607 - The SSH daemon must be configured to use only the SSHv2 protocol
+  - { reg: '^(#)?PrintLastLog', line: 'PrintLastLog yes'}
+  # V-38607 - The SSH daemon must be configured to use only the SSHv2 protocol
+  - { reg: '^(#)?Protocol \d', line: 'Protocol 2'}
+  # V-38614 - The SSH daemon must not allow authentication using an empty password
+  - { reg: '^(#)?PermitEmptyPasswords', line: 'PermitEmptyPasswords no'}
+  # V-38612 - The SSH daemon must not allow host-based authentication
+  - { reg: '^(#)?HostbasedAuthentication', line: 'HostbasedAuthentication no'}
+  # V-38608 - Set a timeout interval for idle ssh sessions
+  - { reg: '^(#)?ClientAliveInterval', line: 'ClientAliveInterval 300'}
+  # V-38610 - Set a timeout count on idle ssh sessions
+  # OpenSCAP report - CCP profile suggested value of 0
+  - { reg: '^(#)?ClientAliveCountMax', line: 'ClientAliveCountMax 0'}
+  # V-38611 - The sshd daemon must ignore .rhosts files
+  - { reg: '^(#)?IgnoreRhosts', line: 'IgnoreRhosts yes'}
+  # V-38616 - The ssh daemon must not permit user environment settings
+  - { reg: '^(#)?PermitUserEnvironment', line: 'PermitUserEnvironment no'}
+  # V-38617 - The ssh daemon must be configured to use approved ciphers
+  - { reg: '^(#)?Ciphers', line: 'Ciphers aes256-ctr,aes256-cbc'}
+  # OpenSCAP report - CCP profile suggested referencing warning banner
+  - { reg: '^(#)?Banner', line: 'Banner /etc/ssh/banner'}
+  # Suggested by lynis audit
+  - { reg: '^(#)?UseDNS', line: 'UseDNS no'}
+  - { reg: '^(#)?AllowAgentForwarding', line: 'AllowAgentForwarding no'}
 #
 # USER
 #
@@ -131,4 +306,3 @@ ansible_centos_base__sysctl_parameters:
   - { name: 'net.ipv4.tcp_timestamps', value: 0 }
   - { name: 'net.ipv6.conf.default.accept_ra', value: 0 }
   - { name: 'fs.suid_dumpable', value: 0 }
-

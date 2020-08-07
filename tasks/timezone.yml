@@ -1,16 +1,16 @@
-- name: BASE_OS | TIMEZONE | If defined set timezone to {{ ansible_centos_base__timezone }}
+- name: ANSIBLE_CENTOS_BASE | TIMEZONE | If defined set timezone to {{ ansible_centos_base__timezone }} # noqa 301
   command: /usr/bin/timedatectl set-timezone '{{ ansible_centos_base__timezone }}'
   when: ansible_centos_base__timezone is defined
-  notify: 
+  notify:
     - restart crond
 
-- name: BASE_OS | TIMEZONE | Using the default timezone {{ ansible_centos_base__timezone_saopaulo }}
+- name: ANSIBLE_CENTOS_BASE | TIMEZONE | Using the default timezone {{ ansible_centos_base__timezone_saopaulo }}
   command: /usr/bin/timedatectl set-timezone '{{ ansible_centos_base__timezone_saopaulo }}'
   when: ansible_centos_base__timezone is not defined
-  notify: 
+  notify:
     - restart crond
 
-- name: BASE_OS | TIMEZONE | Enable ntp
+- name: ANSIBLE_CENTOS_BASE | TIMEZONE | Enable ntp # noqa 301
   command: '/usr/bin/timedatectl set-ntp true'
   notify:
     - restart crond

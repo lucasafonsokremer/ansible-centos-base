@@ -1,7 +1,8 @@
-- name: HARDENING | LOGINTIMEOUT | Apply login auto timeout policy
+- name: ANSIBLE_CENTOS_BASE | LOGINTIMEOUT | Apply login auto timeout policy
   copy:
     src:  profile.d--login-timeout.sh
     dest: /etc/profile.d/login-timeout.sh
     owner: root
     group: root
     mode: 0644
+  when: ansible_centos_base__logintimeout_profile == "yes"

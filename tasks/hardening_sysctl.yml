@@ -1,5 +1,5 @@
 ---
-- name: HARDENING | SYSCTL | sysctl configuration
+- name: ANSIBLE_CENTOS_BASE | SYSCTL | sysctl configuration
   sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"

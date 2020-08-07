@@ -42,19 +42,26 @@ alias rm='rm -i'
 #
 # Get current host related info.
 #
-function ii()
+function getinfolocal()
 {
 	echo -e "\nYou are logged on ${CYAN}$HOSTNAME"
 	echo -e "\nAdditionnal information:$NC " ; uname -a
-	echo -e "${CYAN}BASH Version ${NC}${BASH_VERSION%.*}"
+	echo -e "\n${CYAN}BASH Version ${NC}${BASH_VERSION%.*}"
+        echo -e "\n${CYAN}Current user:$NC " ; whoami
 	echo -e "\n${CYAN}Users logged on:$NC " ; w -h
 	echo -e "\n${CYAN}Current date :$NC " ; date
 	echo -e "\n${CYAN}Machine stats :$NC " ; uptime
-	echo -e "\n${CYAN}Memory stats :$NC " ; free
+	echo -e "\n${CYAN}Number of CPUs :$NC " ; nproc
+	echo -e "\n${CYAN}CPU model :$NC " ; cat /proc/cpuinfo | grep "model name" | head -n1
+	echo -e "\n${CYAN}Top 5 CPU usage :$NC " ; ps aux | head -n1 && ps aux | sort -nrk 3,3 | head -n 5;
+	echo -e "\n${CYAN}Memory stats :$NC " ; free -m
+	echo -e "\n${CYAN}Top 5 memory usage :$NC " ; ps aux | head -n1 && ps aux | sort -nrk 4,4 | head -n 5;
+	echo -e "\n${CYAN}Network interfaces :$NC " ; ip a | grep inet
+	echo -e "\n${CYAN}Network gateways :$NC " ; ip r
+	echo -e "\n${CYAN}Network manager interfaces :$NC " ; nmcli device status
 	echo -e "\n${CYAN}Open connections :$NC "; netstat -pan --inet;
 	echo
 }
-
 
 # Prompt
 if [ `id -un` = root ]; then

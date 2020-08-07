@@ -17,6 +17,8 @@ Variables:
 * The user to be configured and used by ansible.
         ansible_centos_base__username: ansible
 
+* ansible_centos_base__logintimeout_profile = If you don't want ssh connection timeout, check this option to "no". By default this variable is set to "yes".
+
 * ansible_centos_base__root_login = You should use 'yes' or 'no'. For example, when the bool was 'yes', the sshd config will allow root login from ssh.
 
 * authorized_keys file = One ssh public key or more should be setup on file authorized_keys.
@@ -134,6 +136,17 @@ Role Informations
           - bluetooth
 ```
 
+Security and compliance scan results
+------------------------------------
+
+* Before run this role:
+
+![before_scan](images/openscap_before.png)
+
+* After run this role:
+
+![after_scan](images/openscap_after.png)
+
 Dependencies
 ------------
 
@@ -148,6 +161,7 @@ Example Playbook
 
 #ToDo
 -----
+ - Test on amazon linux
  - Configure tuned to improve the server performance
  - Configure automatic tests using TravisCI
  - Allow creating more users

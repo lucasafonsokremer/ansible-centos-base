@@ -1,6 +1,6 @@
 ---
  - name: restart_ssh
-   service: 
+   service:
      name: sshd
      state: restarted
 
@@ -11,6 +11,6 @@
    when: ansible_virtualization_type != "docker"
 
  - name: restart crond
-   service: 
+   service:
      name: crond
      state: restarted
