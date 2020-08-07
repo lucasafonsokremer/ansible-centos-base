@@ -107,12 +107,14 @@ Role Informations
           - kernel-doc
           - bind-utils
           - tcpdump
-          - tuned-utils
-          - strace
-          - ltrace
           - bash-completion
           - yum-utils
           - lsof
+          - tuned-utils
+          - strace
+          - ltrace
+          - net-tools
+          - openscap-scanner
 ```
 
 *  Task to disable various kernel modules

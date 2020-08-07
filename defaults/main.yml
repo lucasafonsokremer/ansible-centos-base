@@ -54,6 +54,7 @@ ansible_centos_base__packages_extra:
   - strace
   - ltrace
   - net-tools
+  - openscap-scanner
 #
 # Timezone setup
 #
